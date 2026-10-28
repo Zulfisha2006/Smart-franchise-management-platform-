@@ -1,0 +1,17 @@
+# Environment variables (contains private Gmail passwords / secret keys)
+.env
+.env.*
+
+# Local Database
+*.sqlite3
+db.sqlite3
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Static & Media uploaded in development
+staticfiles/
+media/

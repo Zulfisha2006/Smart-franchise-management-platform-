@@ -1,0 +1,74 @@
+/* ============================================================
+   SFMS Design System
+   A ledger/operations-room visual identity for the platform —
+   grounded in the F&B franchise world: receipts, tickets, ledgers.
+   ============================================================ */
+
+:root {
+  /* --- Color palette --- */
+  --ink: #1B1F1D;
+  --ink-soft: #5B6461;
+  --paper: #FAF9F6;
+  --surface: #FFFFFF;
+  --surface-sunken: #F1F0EA;
+  --border: #E4E2D8;
+
+  --teal: #0D5C4A;
+  --teal-deep: #093F33;
+  --teal-tint: #E5F0EC;
+
+  --amber: #E28B26;
+  --amber-tint: #FCEEDA;
+
+  --charcoal: #14213D;
+  --charcoal-soft: #1F2E54;
+
+  --red: #B3261E;
+  --red-tint: #FBEAE9;
+  --green: #1E7A4C;
+  --green-tint: #E7F5EC;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 1px 2px rgba(27, 31, 29, 0.04), 0 4px 16px rgba(27, 31, 29, 0.06);
+  --shadow-pop: 0 8px 30px rgba(27, 31, 29, 0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+button { font-family: var(--font-body); }
+input, select, textarea { font-family: var(--font-body); }
+
+::selection { background: var(--teal-tint); color: var(--teal-deep); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }

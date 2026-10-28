@@ -1,0 +1,319 @@
+/* ============================================================
+   Chainhub — Landing Page
+   Dark restaurant background + illustration right column
+   Inspired by: Food Heaven reference layout
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+/* ── Root & Background ─────────────────────────────────────── */
+.lp-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+
+  /* Dark restaurant background — same as original */
+  background-color: #0a1120;
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(10, 17, 32, 0.96) 0%,
+      rgba(10, 17, 32, 0.85) 50%,
+      rgba(10, 17, 32, 0.45) 100%
+    ),
+    url("../assets/hero-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #ffffff;
+}
+
+/* Soft amber glow from bottom-left */
+.lp-root::before {
+  content: "";
+  position: fixed;
+  bottom: -60px;
+  left: -60px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(226, 139, 38, 0.13) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Soft teal glow top-right */
+.lp-root::after {
+  content: "";
+  position: fixed;
+  top: -80px;
+  right: -80px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(13, 92, 74, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.lp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 64px;
+  background: rgba(10, 17, 32, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.lp-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+}
+
+.lp-brand-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #E28B26;
+  color: #0a1120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 12px rgba(226, 139, 38, 0.4);
+}
+
+.lp-brand-badge.sm {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+
+.lp-brand-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+}
+
+.lp-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.lp-nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.lp-nav-link:hover { color: #ffffff; }
+
+.lp-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lp-btn-ghost {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.15s;
+  background: transparent;
+}
+.lp-btn-ghost:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lp-btn-solid {
+  padding: 8px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0a1120;
+  text-decoration: none;
+  border-radius: 8px;
+  background: #E28B26;
+  box-shadow: 0 2px 10px rgba(226, 139, 38, 0.35);
+  transition: all 0.18s;
+}
+.lp-btn-solid:hover {
+  background: #f5a040;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(226, 139, 38, 0.45);
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.lp-hero {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 64px;
+  width: 100%;
+  min-height: calc(100vh - 73px);
+}
+
+/* ── Left: Text ───────────────────────────────────────────── */
+.lp-hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 680px;
+}
+
+.lp-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 68px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  margin-bottom: 22px;
+  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+}
+
+.lp-headline-accent {
+  color: #E28B26;
+}
+
+.lp-sub {
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 520px;
+  margin-bottom: 36px;
+  font-weight: 400;
+}
+
+/* CTA group */
+.lp-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.lp-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 30px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a1120;
+  text-decoration: none;
+  border-radius: 10px;
+  background: #E28B26;
+  box-shadow: 0 4px 16px rgba(226, 139, 38, 0.38);
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+}
+.lp-cta-primary:hover {
+  background: #f5a040;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(226, 139, 38, 0.48);
+}
+
+.lp-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  transition: all 0.18s;
+}
+.lp-cta-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.lp-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 64px;
+}
+
+.lp-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lp-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.lp-footer-copy {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .lp-nav  { padding: 16px 36px; }
+  .lp-hero { padding: 60px 36px; }
+  .lp-headline { font-size: 54px; }
+}
+
+@media (max-width: 780px) {
+  .lp-hero {
+    padding: 48px 24px;
+    min-height: auto;
+  }
+  .lp-headline { font-size: 42px; }
+  .lp-nav-links { display: none; }
+}
+
+@media (max-width: 500px) {
+  .lp-nav { padding: 14px 20px; }
+  .lp-headline { font-size: 34px; }
+  .lp-sub { font-size: 14.5px; }
+  .lp-cta-group { flex-direction: column; width: 100%; }
+  .lp-cta-primary,
+  .lp-cta-ghost { justify-content: center; width: 100%; }
+  .lp-footer { padding: 16px 20px; }
+}

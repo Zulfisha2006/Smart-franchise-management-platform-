@@ -1,0 +1,8 @@
+{
+  "include": [
+    "sfms_backend"
+  ],
+  "extraPaths": [
+    "sfms_backend"
+  ]
+}

@@ -1,0 +1,31 @@
+databases:
+  - name: chainhub-db
+    plan: free
+    databaseName: chainhub
+    user: chainhub_user
+
+services:
+  - type: web
+    name: chainhub-backend
+    runtime: python
+    rootDir: sfms_backend
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn sfms_backend.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: false
+      - key: CORS_ALLOW_ALL
+        value: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chainhub-db
+          property: connectionString
