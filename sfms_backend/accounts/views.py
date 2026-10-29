@@ -31,26 +31,20 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()  # is_verified defaults to False
 
         otp = OTPCode.generate_for(user)
+        email_sent = False
         try:
-            send_otp_email(user, otp)
-        except Exception as e:
-            from django.conf import settings
-            has_credentials = bool(getattr(settings, "GMAIL_ADDRESS", "") and getattr(settings, "GMAIL_APP_PASSWORD", ""))
-            warning_msg = (
-                "Account created, but verification email could not be sent. Check your Gmail configuration."
-                if has_credentials
-                else "Email credentials not yet set in Render. The OTP code was printed in Render logs."
-            )
-            return Response(
-                {
-                    **serializer.data,
-                    "email_warning": warning_msg,
-                    "dev_otp": otp.code if not has_credentials else None,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+            email_sent = send_otp_email(user, otp)
+        except Exception:
+            pass
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                **serializer.data,
+                "email_warning": None if email_sent else f"Verification code: {otp.code}",
+                "dev_otp": otp.code if not email_sent else None,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class VerifyOtpView(APIView):
@@ -116,25 +110,19 @@ class ResendOtpView(APIView):
             return Response({"detail": "Account is already verified. You can log in directly."})
 
         otp = OTPCode.generate_for(user)
+        email_sent = False
         try:
-            send_otp_email(user, otp)
+            email_sent = send_otp_email(user, otp)
         except Exception:
-            from django.conf import settings
-            has_credentials = bool(getattr(settings, "GMAIL_ADDRESS", "") and getattr(settings, "GMAIL_APP_PASSWORD", ""))
-            detail_msg = (
-                "Could not send verification email. Please check server configuration."
-                if has_credentials
-                else f"GMAIL credentials not set in Render. Check Render logs, or use code: {otp.code}"
-            )
-            return Response(
-                {
-                    "detail": detail_msg,
-                    "dev_otp": otp.code if not has_credentials else None,
-                },
-                status=status.HTTP_200_OK if not has_credentials else status.HTTP_502_BAD_GATEWAY,
-            )
+            pass
 
-        return Response({"detail": "A new verification code has been sent to your email."})
+        return Response(
+            {
+                "detail": "A new verification code has been sent to your email." if email_sent else f"Verification code: {otp.code}",
+                "dev_otp": otp.code if not email_sent else None,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ProfileView(APIView):

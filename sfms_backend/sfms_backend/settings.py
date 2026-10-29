@@ -193,6 +193,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
+EMAIL_TIMEOUT = 4  # Prevent worker hanging on cloud platforms like Render
 EMAIL_HOST_USER = GMAIL_ADDRESS
 EMAIL_HOST_PASSWORD = GMAIL_APP_PASSWORD
 DEFAULT_FROM_EMAIL = f"Chainhub <{GMAIL_ADDRESS}>" if GMAIL_ADDRESS else "Chainhub <noreply@chainhub.com>"
