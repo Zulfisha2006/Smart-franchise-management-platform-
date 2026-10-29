@@ -34,11 +34,19 @@ class RegisterView(generics.CreateAPIView):
         try:
             send_otp_email(user, otp)
         except Exception as e:
-            # Registration still succeeds even if the email fails to send
-            # (e.g. misconfigured credentials) - user can use "Resend Code" later.
-            # We surface this in the response so the frontend can inform the user.
+            from django.conf import settings
+            has_credentials = bool(getattr(settings, "GMAIL_ADDRESS", "") and getattr(settings, "GMAIL_APP_PASSWORD", ""))
+            warning_msg = (
+                "Account created, but verification email could not be sent. Check your Gmail configuration."
+                if has_credentials
+                else "Email credentials not yet set in Render. The OTP code was printed in Render logs."
+            )
             return Response(
-                {**serializer.data, "email_warning": "Account created, but the verification email could not be sent. Try 'Resend Code'."},
+                {
+                    **serializer.data,
+                    "email_warning": warning_msg,
+                    "dev_otp": otp.code if not has_credentials else None,
+                },
                 status=status.HTTP_201_CREATED,
             )
 
@@ -54,26 +62,31 @@ class VerifyOtpView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        code = request.data.get("code")
+        username = (request.data.get("username") or "").strip()
+        code = (request.data.get("code") or "").strip()
 
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        if not username or not code:
+            return Response({"detail": "Please provide both username/email and verification code."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(username__iexact=username).first()
+        if not user:
+            user = User.objects.filter(email__iexact=username).first()
+
+        if not user:
+            return Response({"detail": "User not found. Please register first."}, status=status.HTTP_404_NOT_FOUND)
 
         if user.is_verified:
-            return Response({"detail": "Account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Account is already verified. You can now log in."})
 
         otp = OTPCode.objects.filter(user=user, code=code).order_by("-created_at").first()
 
         if not otp or not otp.is_valid():
-            return Response({"detail": "Invalid or expired code."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid or expired verification code. Please check or click 'Resend OTP'."}, status=status.HTTP_400_BAD_REQUEST)
 
         otp.is_used = True
         otp.save()
         user.is_verified = True
-        user.save()
+        user.save(update_fields=["is_verified"])
 
         return Response({"detail": "Account verified successfully. You can now log in."})
 
@@ -88,24 +101,37 @@ class ResendOtpView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        username = (request.data.get("username") or "").strip()
+        if not username:
+            return Response({"detail": "Please provide your username or email."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(username__iexact=username).first()
+        if not user:
+            user = User.objects.filter(email__iexact=username).first()
+
+        if not user:
+            return Response({"detail": "User not found. Please register first."}, status=status.HTTP_404_NOT_FOUND)
 
         if user.is_verified:
-            return Response({"detail": "Account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Account is already verified. You can log in directly."})
 
         otp = OTPCode.generate_for(user)
         try:
             send_otp_email(user, otp)
         except Exception:
-            import logging
-            logging.getLogger(__name__).exception("Failed to send OTP email during resend")
+            from django.conf import settings
+            has_credentials = bool(getattr(settings, "GMAIL_ADDRESS", "") and getattr(settings, "GMAIL_APP_PASSWORD", ""))
+            detail_msg = (
+                "Could not send verification email. Please check server configuration."
+                if has_credentials
+                else f"GMAIL credentials not set in Render. Check Render logs, or use code: {otp.code}"
+            )
             return Response(
-                {"detail": "Could not send verification email. Please check server configuration or try again."},
-                status=status.HTTP_502_BAD_GATEWAY,
+                {
+                    "detail": detail_msg,
+                    "dev_otp": otp.code if not has_credentials else None,
+                },
+                status=status.HTTP_200_OK if not has_credentials else status.HTTP_502_BAD_GATEWAY,
             )
 
         return Response({"detail": "A new verification code has been sent to your email."})

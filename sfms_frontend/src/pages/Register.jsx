@@ -19,11 +19,16 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await registerUser(form);
+      const res = await registerUser(form);
       setSuccess(true);
       setTimeout(() => {
         navigate("/verify-otp", {
-          state: { username: form.username, email: form.email },
+          state: {
+            username: form.username,
+            email: form.email,
+            warning: res.data?.email_warning,
+            dev_otp: res.data?.dev_otp,
+          },
         });
       }, 1000);
     } catch (err) {

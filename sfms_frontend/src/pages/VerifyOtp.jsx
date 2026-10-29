@@ -7,12 +7,15 @@ export default function VerifyOtp() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Username and email passed from Register or Login
-  const username = location.state?.username || "";
+  // Username and email passed from Register or Login, or entered manually if refreshed
+  const [username, setUsername] = useState(location.state?.username || "");
   const emailHint = location.state?.email || "";
+  const initialNotice = location.state?.warning || "";
+  const initialDevOtp = location.state?.dev_otp || "";
 
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(initialDevOtp || "");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState(initialNotice);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -20,10 +23,14 @@ export default function VerifyOtp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username.trim()) {
+      setError("Please enter your username or email.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
-      await verifyOtp({ username, code });
+      await verifyOtp({ username: username.trim(), code: code.trim() });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1400);
     } catch (err) {
@@ -34,42 +41,26 @@ export default function VerifyOtp() {
   };
 
   const handleResend = async () => {
+    if (!username.trim()) {
+      setError("Please enter your username or email first.");
+      return;
+    }
     setResendMessage("");
     setError("");
     setResendLoading(true);
     try {
-      const res = await resendOtp({ username });
+      const res = await resendOtp({ username: username.trim() });
       setResendMessage(res.data?.detail || "A fresh 6-digit verification code has been sent.");
+      if (res.data?.dev_otp) {
+        setCode(res.data.dev_otp);
+        setNotice(`OTP generated: ${res.data.dev_otp}`);
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Could not resend code. Please try again.");
     } finally {
       setResendLoading(false);
     }
   };
-
-  if (!username) {
-    return (
-      <div className="auth-page">
-        <div className="auth-top-nav">
-          <Link to="/" className="auth-back-btn">
-            <span>←</span>
-            <span>Back to Chainhub</span>
-          </Link>
-        </div>
-        <div className="auth-card" style={{ textAlign: "center", padding: "44px 32px" }}>
-          <div style={{ fontSize: "36px", marginBottom: "16px" }}></div>
-          <h2 className="auth-header-title">No Account to Verify</h2>
-          <p className="auth-header-sub" style={{ marginBottom: "28px" }}>
-            Please register your franchise account or sign in first.
-          </p>
-          <Link to="/register" className="auth-submit-btn" style={{ textDecoration: "none" }}>
-            <span>Go to Registration</span>
-            <span>→</span>
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="auth-page">
@@ -91,11 +82,23 @@ export default function VerifyOtp() {
         <div className="auth-header">
           <h2 className="auth-header-title">Verify Your Email</h2>
           <p className="auth-header-sub">
-            Enter the 6-digit verification code sent to {emailHint ? <strong>{emailHint}</strong> : "your email"} for user <code style={{ color: "var(--teal)", fontFamily: "var(--font-mono)" }}>@{username}</code>.
+            {username ? (
+              <>
+                Enter the 6-digit verification code sent to {emailHint ? <strong>{emailHint}</strong> : "your email"} for user <code style={{ color: "var(--teal)", fontFamily: "var(--font-mono)" }}>@{username}</code>.
+              </>
+            ) : (
+              "Enter your username and the 6-digit verification code sent to your email."
+            )}
           </p>
         </div>
 
         {/* Alerts */}
+        {notice && !error && (
+          <div className="auth-alert-box info" style={{ background: "rgba(20, 184, 166, 0.1)", border: "1px solid rgba(20, 184, 166, 0.3)", color: "var(--teal)", padding: "10px 14px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+            ℹ️ {notice}
+          </div>
+        )}
+
         {error && (
           <div className="auth-alert-box error">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" style={{ flexShrink: 0, marginTop: 1 }}>
@@ -125,6 +128,25 @@ export default function VerifyOtp() {
 
         {/* Verification Form */}
         <form onSubmit={handleSubmit}>
+          {!location.state?.username && (
+            <div className="auth-form-group" style={{ marginBottom: "16px" }}>
+              <label className="auth-field-label" htmlFor="otp-username">
+                <span>Username or Email</span>
+              </label>
+              <div className="auth-input-wrapper">
+                <input
+                  id="otp-username"
+                  className="auth-input-field"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username or email"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
           <div className="auth-form-group" style={{ margin: "22px 0" }}>
             <label className="auth-field-label" htmlFor="otp-input" style={{ justifyContent: "center", marginBottom: "10px" }}>
               <span>Enter 6-Digit Passcode</span>
