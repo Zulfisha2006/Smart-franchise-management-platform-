@@ -50,7 +50,7 @@ You have two easy ways on Render:
    - **Runtime**: `Python 3`
    - **Build Command**:
      ```bash
-     pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+     pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput && python create_admin.py
      ```
    - **Start Command**:
      ```bash
@@ -69,10 +69,12 @@ You have two easy ways on Render:
 
 3. Once deployed, copy your live backend URL (e.g. `https://chainhub-backend.onrender.com`).
 
-> **Create Admin User**: In the Render dashboard, open the **Shell** tab of your web service and run:
-> ```bash
-> python manage.py createsuperuser
-> ```
+> **Create Admin User (100% Free - No Shell Needed)**:
+> In the Render dashboard, under **Environment Variables**, add:
+> - `ADMIN_USERNAME`: your desired admin username (e.g. `admin` or your old username)
+> - `ADMIN_PASSWORD`: your desired password
+> - `ADMIN_EMAIL`: your email
+> The build script (`create_admin.py`) will automatically create/update your superuser during build!
 
 ---
 
