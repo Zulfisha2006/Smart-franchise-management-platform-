@@ -27,7 +27,6 @@ export default function Register() {
             username: form.username,
             email: form.email,
             warning: res.data?.email_warning,
-            dev_otp: res.data?.dev_otp,
           },
         });
       }, 1000);

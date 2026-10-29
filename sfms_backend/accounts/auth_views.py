@@ -55,9 +55,17 @@ class VerifiedTokenObtainPairSerializer(TokenObtainPairSerializer):
                 user.save(update_fields=["is_verified"])
 
         if not user.is_verified:
+            from .models import OTPCode
+            from .email_utils import send_otp_email
+            otp = OTPCode.generate_for(user)
+            try:
+                send_otp_email(user, otp)
+            except Exception:
+                pass
+
             raise serializers.ValidationError(
                 {
-                    "detail": "Please verify your email before logging in.",
+                    "detail": f"Your account is not verified yet. We sent a 6-digit verification code to {user.email}.",
                     "needs_verification": True,
                     "username": user.username,
                     "email": user.email,

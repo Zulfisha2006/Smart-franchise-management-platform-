@@ -64,6 +64,8 @@ You have two easy ways on Render:
      | `CORS_ALLOW_ALL` | `False` | Restricts API access to authorized frontend origins |
      | `CORS_ALLOWED_ORIGINS` | `https://<your-project>.vercel.app` | Your live Vercel frontend URL |
      | `CSRF_TRUSTED_ORIGINS` | `https://<your-project>.vercel.app` | CSRF protection for your live frontend |
+     | `BREVO_API_KEY` | `xkeysib-xxxxxxxxxxxx` | Free Brevo API key (Sends real emails over HTTPS - unblocked on Render) |
+     | `BREVO_SENDER_EMAIL` | `your_email@gmail.com` | Your verified sender email address in Brevo |
      | `GMAIL_ADDRESS` | `your_email@gmail.com` | For sending OTP verification codes |
      | `GMAIL_APP_PASSWORD` | `your_16_digit_app_password` | Google 2FA App Password |
 

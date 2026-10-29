@@ -31,17 +31,21 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()  # is_verified defaults to False
 
         otp = OTPCode.generate_for(user)
-        email_sent = False
         try:
-            email_sent = send_otp_email(user, otp)
-        except Exception:
-            pass
+            send_otp_email(user, otp)
+        except Exception as e:
+            return Response(
+                {
+                    **serializer.data,
+                    "email_warning": f"Account created, but verification email could not be sent: {str(e)}. Please check Brevo configuration.",
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
         return Response(
             {
                 **serializer.data,
-                "email_warning": None if email_sent else f"Verification code: {otp.code}",
-                "dev_otp": otp.code if not email_sent else None,
+                "detail": f"Verification code sent to {user.email}. Please check your inbox.",
             },
             status=status.HTTP_201_CREATED,
         )
@@ -110,17 +114,16 @@ class ResendOtpView(APIView):
             return Response({"detail": "Account is already verified. You can log in directly."})
 
         otp = OTPCode.generate_for(user)
-        email_sent = False
         try:
-            email_sent = send_otp_email(user, otp)
-        except Exception:
-            pass
+            send_otp_email(user, otp)
+        except Exception as e:
+            return Response(
+                {"detail": f"Could not send email: {str(e)}. Please check Brevo configuration."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         return Response(
-            {
-                "detail": "A new verification code has been sent to your email." if email_sent else f"Verification code: {otp.code}",
-                "dev_otp": otp.code if not email_sent else None,
-            },
+            {"detail": f"A fresh verification code has been sent to {user.email}. Please check your inbox."},
             status=status.HTTP_200_OK,
         )
 

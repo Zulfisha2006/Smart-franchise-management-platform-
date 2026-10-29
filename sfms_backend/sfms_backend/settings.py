@@ -184,7 +184,12 @@ if HAS_WHITENOISE:
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 # ---------- Email (for OTP verification) ----------
-# Real credentials come from a .env file (see .env.example) - never hardcoded here.
+# Brevo (Sendinblue) HTTP API is the recommended email provider for Render free tier
+# because Render blocks outgoing SMTP socket ports (25, 465, 587), but allows HTTPS (port 443).
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
+BREVO_SENDER_EMAIL = os.environ.get("BREVO_SENDER_EMAIL", "")
+
+# Fallback standard SMTP credentials
 GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
@@ -193,10 +198,10 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_TIMEOUT = 4  # Prevent worker hanging on cloud platforms like Render
+EMAIL_TIMEOUT = 5  # Prevent worker hanging on cloud platforms like Render
 EMAIL_HOST_USER = GMAIL_ADDRESS
 EMAIL_HOST_PASSWORD = GMAIL_APP_PASSWORD
-DEFAULT_FROM_EMAIL = f"Chainhub <{GMAIL_ADDRESS}>" if GMAIL_ADDRESS else "Chainhub <noreply@chainhub.com>"
+DEFAULT_FROM_EMAIL = f"Chainhub <{BREVO_SENDER_EMAIL or GMAIL_ADDRESS or 'noreply@chainhub.com'}>"
 
 AUTH_USER_MODEL = 'accounts.User'
 

@@ -11,9 +11,8 @@ export default function VerifyOtp() {
   const [username, setUsername] = useState(location.state?.username || "");
   const emailHint = location.state?.email || "";
   const initialNotice = location.state?.warning || "";
-  const initialDevOtp = location.state?.dev_otp || "";
 
-  const [code, setCode] = useState(initialDevOtp || "");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(initialNotice);
   const [success, setSuccess] = useState(false);
@@ -50,11 +49,7 @@ export default function VerifyOtp() {
     setResendLoading(true);
     try {
       const res = await resendOtp({ username: username.trim() });
-      setResendMessage(res.data?.detail || "A fresh 6-digit verification code has been sent.");
-      if (res.data?.dev_otp) {
-        setCode(res.data.dev_otp);
-        setNotice(`OTP generated: ${res.data.dev_otp}`);
-      }
+      setResendMessage(res.data?.detail || "A fresh 6-digit verification code has been sent to your email.");
     } catch (err) {
       setError(err.response?.data?.detail || "Could not resend code. Please try again.");
     } finally {
